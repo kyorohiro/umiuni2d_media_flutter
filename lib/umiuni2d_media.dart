@@ -95,15 +95,16 @@ class AudioPlayer {
     return this;
   }
 
-  Future<num> getCurentTime() async {
+  Future<double> getCurentTime() async {
     return MediaManager.channel.invokeMethod('getCurentTime',[_id]);
   }
 
-  Future<num> setVolume(num volume, num interval) async {
-    return MediaManager.channel.invokeMethod('setVolume',[_id, volume, interval]);
+  Future<AudioPlayer> setVolume(double volume, num interval) async {
+    await MediaManager.channel.invokeMethod('setVolume',[_id, volume, interval]);
+    return this;
   }
 
-  Future<num> getVolume() async {
+  Future<double> getVolume() async {
     return MediaManager.channel.invokeMethod('getVolume',[_id]);
   }
 }

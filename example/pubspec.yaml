@@ -15,7 +15,9 @@ dev_dependencies:
 
   umiuni2d_media_flutter:
     path: ../
-
+  umiuni2d_media:
+    git:
+      url: https://github.com/kyorohiro/umiuni2d_media.git
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec
 

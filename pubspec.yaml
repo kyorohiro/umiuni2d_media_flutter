@@ -7,7 +7,9 @@ homepage:
 dependencies:
   flutter:
     sdk: flutter
-
+  umiuni2d_media:
+    git:
+      url: https://github.com/kyorohiro/umiuni2d_media.git
 flutter:
   plugin:
     androidPackage: net.umiuni2d.umiuni2dmediaflutter

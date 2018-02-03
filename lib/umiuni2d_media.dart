@@ -1,12 +1,16 @@
 import 'dart:async';
 import 'package:flutter/services.dart' as service;
+import 'package:umiuni2d_media/umiuni2d_media.dart' as umi;
 import 'dart:io';
 
 
-class MediaManager {
+class MediaManager extends umi.MediaManager{
   static const service.MethodChannel _channel = const service.MethodChannel('umiuni2d_media');
   static service.MethodChannel get channel => _channel;
 
+  String assetsRoot;
+  MediaManager(this.assetsRoot) {
+  }
   Future<String> getPath() async {
     return _channel.invokeMethod('getPath');
   }
@@ -14,7 +18,9 @@ class MediaManager {
   Future<String> getAssetPath(String key) async {
     String path = (await getPath()).replaceAll(new RegExp(r"/$"), "");
     String keyPath = (path).replaceAll(new RegExp(r"^/"), "");
-    return path + "/assets/" + key;
+    String assets = assetsRoot.replaceAll(new RegExp(r"/$"), "");
+    assets = assets.replaceAll(new RegExp(r"^/"), "");
+    return path + "/"+assets+"/" + key;
   }
 
   Future<String> _prepareAssetPath(String key) async {
@@ -58,12 +64,12 @@ class MediaManager {
 }
 
 
-class AudioPlayer {
+class AudioPlayer extends umi.AudioPlayer  {
   String _id;
   String _path;
 
-  String get id => _id;
-  String get path => _path;
+  String get playerId => _id;
+  String get url => _path;
 
   AudioPlayer(String id, String path){
     this._id = id;

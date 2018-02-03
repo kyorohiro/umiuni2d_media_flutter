@@ -29,7 +29,7 @@ class _MyAppState extends sky.State<MyApp> {
   }
 
   initPlatformState() async {
-    _player = new MediaManager();
+    _player = new MediaManager("/assets");
 
     new Future.delayed(new Duration(seconds: 0)).then((dynamic d) async {
       String message = "";
@@ -135,7 +135,7 @@ class _MyAppState extends sky.State<MyApp> {
 
     String message = "";
     AudioPlayer _audio = _player.getAudioPlayer(radioValue);
-    print("## ${_audio.id} ${_audio.path}");
+    print("## ${_audio.playerId} ${_audio.url}");
     try {
       if(label == "Play") {
         await _audio.play();

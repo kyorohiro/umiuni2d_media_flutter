@@ -53,9 +53,7 @@ class MediaManager extends umi.MediaManager{
 
   @override
   Future<AudioPlayer> loadAudioPlayer(String id, String key) async {
-    print("call load Au 1");
     AudioPlayer player = await createAudioPlayer(id, key);
-    print("call load Au 2");
     await player.prepare();
     return player;
   }
@@ -86,8 +84,16 @@ class AudioPlayer extends umi.AudioPlayer  {
   String get playerId => _id;
   String get url => _path;
 
-  AudioPlayer(String id, String path){
-    this._id = id;
+  bool _isPlaying = false;
+  bool get isPlaying => _isPlaying;
+  bool _isPrepared = false;
+  bool get isPrepared => _isPrepared;
+
+  double _pauseAt = 0.0;
+  double _volume = 0.5;
+
+  AudioPlayer(String playerId, String path){
+    this._id = playerId;
     this._path = path;
   }
 
@@ -98,36 +104,56 @@ class AudioPlayer extends umi.AudioPlayer  {
     if(resultObj["status"] != "passed") {
       throw resultSrc;
     }
+    _isPrepared = true;
     return this;
   }
 
   @override
   Future<AudioPlayer> play() async {
+    if(!isPrepared) {
+      await prepare();
+    }
+    _isPlaying = true;
+    seek(_pauseAt);
+    setVolume(_volume);
     String resultSrc = await MediaManager._channel.invokeMethod('play',[_id]);
     Map<String,String> resultObj = conv.JSON.decode(resultSrc);
     if(resultObj["status"] != "passed") {
+      _isPlaying = false;
       throw resultSrc;
     }
+    _isPlaying = true;
     return this;
   }
 
   @override
   Future<AudioPlayer> pause() async {
+    if(!isPrepared) {
+      await prepare();
+    }
     String resultSrc = await MediaManager.channel.invokeMethod('pause',[_id]);
     Map<String,String> resultObj = conv.JSON.decode(resultSrc);
     if(resultObj["status"] != "passed") {
       throw resultSrc;
     }
+    _pauseAt = await getCurrentTime();
+    _isPlaying = false;
     return this;
   }
 
   @override
   Future<AudioPlayer> stop() async {
+    if(!isPrepared) {
+      await prepare();
+    }
     String resultSrc = await MediaManager.channel.invokeMethod('stop',[_id]);
     Map<String,String> resultObj = conv.JSON.decode(resultSrc);
     if(resultObj["status"] != "passed") {
       throw resultSrc;
     }
+    _isPlaying = false;
+    _isPrepared = false;
+    _pauseAt = 0.0;
     return this;
   }
 
@@ -136,17 +162,26 @@ class AudioPlayer extends umi.AudioPlayer  {
     if(currentTime < 0.0) {
       currentTime = 0.0;
     }
-    String resultSrc = await MediaManager.channel.invokeMethod('seek',[_id,currentTime]);
-    Map<String,String> resultObj = conv.JSON.decode(resultSrc);
-    if(resultObj["status"] != "passed") {
-      throw resultSrc;
+    if(!isPrepared || !isPlaying) {
+      this._pauseAt = currentTime;
+      return this;
+    } else {
+      String resultSrc = await MediaManager.channel.invokeMethod('seek', [_id, currentTime]);
+      Map<String, String> resultObj = conv.JSON.decode(resultSrc);
+      if (resultObj["status"] != "passed") {
+        throw resultSrc;
+      }
+      return this;
     }
-    return this;
   }
 
   @override
   Future<double> getCurrentTime() async {
-    return MediaManager.channel.invokeMethod('getCurentTime',[_id]);
+    if(isPlaying) {
+      return this._pauseAt;
+    } else {
+      return MediaManager.channel.invokeMethod('getCurentTime', [_id]);
+    }
   }
 
   @override
@@ -154,7 +189,11 @@ class AudioPlayer extends umi.AudioPlayer  {
     if(volume < 0) {
       volume = 0.0;
     }
-    String resultSrc = await MediaManager.channel.invokeMethod('setVolume',[_id, volume, 0.1]);
+    this._volume = volume;
+    if(!_isPlaying) {
+      return this;
+    }
+    String resultSrc = await MediaManager.channel.invokeMethod('setVolume',[_id, this._volume, 0.1]);
     Map<String,String> resultObj = conv.JSON.decode(resultSrc);
     if(resultObj["status"] != "passed") {
       throw resultSrc;
@@ -164,6 +203,7 @@ class AudioPlayer extends umi.AudioPlayer  {
 
   @override
   Future<double> getVolume() async {
-    return MediaManager.channel.invokeMethod('getVolume',[_id]);
+     return _volume;
   }
+
 }

@@ -122,7 +122,7 @@ public class Umiuni2dMediaFlutterPlugin implements MethodCallHandler {
         float volume = ((Number)args.get(1)).floatValue();
         mVolume = volume;
         player.setVolume(mVolume, mVolume);
-        result.success(((double)volume)/1000.0);
+        result.success("{\"status\":\"passed\"}");
       } catch(Exception e) {
         result.success("{\"status\":\"failed\"}");
       }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart' as sky;
 import 'package:flutter/services.dart';
-import 'package:umiuni2d_media_flutter/umiuni2d_media_flutter.dart';
+import 'package:umiuni2d_media_flutter/umiuni2d_media.dart';
 import 'dart:async';
 import 'dart:io' as io;
 void main() => sky.runApp(new MyApp());
@@ -11,7 +11,7 @@ class MyApp extends sky.StatefulWidget {
 }
 
 class _MyAppState extends sky.State<MyApp> {
-  Umiuni2dMedia _player;
+  MediaManager _player;
   String _message = 'Unknown';
 
   Map<String,String> audioFiles = {
@@ -29,7 +29,7 @@ class _MyAppState extends sky.State<MyApp> {
   }
 
   initPlatformState() async {
-    _player = new Umiuni2dMedia();
+    _player = new MediaManager();
 
     new Future.delayed(new Duration(seconds: 0)).then((dynamic d) async {
       String message = "";
@@ -134,29 +134,29 @@ class _MyAppState extends sky.State<MyApp> {
     }
 
     String message = "";
-    Umiuni2dAudio _audio = _player.getAudio(radioValue);
+    AudioPlayer _audio = _player.getAudio(radioValue);
     print("## ${_audio.id} ${_audio.path}");
     try {
       if(label == "Play") {
-        message += await _audio.play();
+        await _audio.play();
       }
       if(label == "Load") {
-        message += await _audio.load();
+        await _audio.prepare();
       }
       if(label == "Pause") {
-        message += await _audio.pause();
+        await _audio.pause();
       }
       if(label == "Stop") {
-        message += await _audio.stop();
+        await _audio.stop();
       }
       if(label == "+5s") {
-        message += await _audio.seek(await _audio.getCurentTime()+5.0);
+        await _audio.seek(await _audio.getCurentTime()+5.0);
       }
       if(label == "-5s") {
-        message += await _audio.seek(await _audio.getCurentTime()-5.0);
+        await _audio.seek(await _audio.getCurentTime()-5.0);
       }
       if(label == 'volume up') {
-        message += await _audio.seek(await _audio.getCurentTime()-5.0);
+        await _audio.seek(await _audio.getCurentTime()-5.0);
       }
       if(label == 'Volume down') {
         await _audio.setVolume(await _audio.getVolume()-0.1, 1.0);

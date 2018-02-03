@@ -3,7 +3,7 @@ import 'package:flutter/services.dart' as service;
 import 'dart:io';
 
 
-class Umiuni2dMedia {
+class MediaManager {
   static const service.MethodChannel _channel = const service.MethodChannel('umiuni2d_media');
   static service.MethodChannel get channel => _channel;
 
@@ -27,7 +27,7 @@ class Umiuni2dMedia {
     await (new Directory(dir)).create(recursive: true);
     return path;
   }
-  Future<Umiuni2dMedia> setupFromAssets(String key) async {
+  Future<MediaManager> setupFromAssets(String key) async {
     String outputPath = await prepareAssetPath(key);
     print("=TEST="+outputPath);
     service.AssetBundle bundle =  (service.rootBundle != null) ? service.rootBundle : new service.NetworkAssetBundle(new Uri.directory(Uri.base.origin));
@@ -36,61 +36,74 @@ class Umiuni2dMedia {
     await output.writeAsBytes(data.buffer.asUint8List(),flush: true);
     return this;
   }
-  Map<String, Umiuni2dAudio> _audioMap = {};
-  Future<Umiuni2dAudio> load(String id, String key) async {
+  Map<String, AudioPlayer> _audioMap = {};
+  Future<AudioPlayer> load(String id, String key) async {
     String path = await getAssetPath(key);
-    Umiuni2dAudio ret =  new Umiuni2dAudio(id, path);
-    await ret.load();
+    AudioPlayer ret =  new AudioPlayer(id, path);
+    await ret.prepare();
     _audioMap[id] = ret;
     return ret;
   }
 
-  Umiuni2dAudio getAudio(String id) {
+  Future<AudioPlayer> createAudioPlayer(String id, String key) async {
+    String path = await getAssetPath(key);
+    AudioPlayer ret =  new AudioPlayer(id, path);
+    _audioMap[id] = ret;
+    return ret;
+  }
+
+  AudioPlayer getAudio(String id) {
     return _audioMap[id];
   }
 }
 
 
-class Umiuni2dAudio {
+class AudioPlayer {
   String _id;
   String _path;
 
   String get id => _id;
   String get path => _path;
-  Umiuni2dAudio(String id, String path){
+
+  AudioPlayer(String id, String path){
     this._id = id;
     this._path = path;
   }
 
-  Future<String> load() async {
-    return  await Umiuni2dMedia._channel.invokeMethod('load',[_id, _path]);
+  Future<AudioPlayer> prepare() async {
+    await MediaManager._channel.invokeMethod('load',[_id, _path]);
+    return this;
   }
 
-  Future<String> play() async {
-    return await Umiuni2dMedia._channel.invokeMethod('play',[_id]);
+  Future<AudioPlayer> play() async {
+    await MediaManager._channel.invokeMethod('play',[_id]);
+    return this;
   }
 
-  Future<String> pause() async {
-    return Umiuni2dMedia.channel.invokeMethod('pause',[_id]);
+  Future<AudioPlayer> pause() async {
+    await MediaManager.channel.invokeMethod('pause',[_id]);
+    return this;
   }
 
-  Future<String> stop() async {
-    return Umiuni2dMedia.channel.invokeMethod('stop',[_id]);
+  Future<AudioPlayer> stop() async {
+    await MediaManager.channel.invokeMethod('stop',[_id]);
+    return this;
   }
 
-  Future<String> seek(double currentTime) async {
-    return Umiuni2dMedia.channel.invokeMethod('seek',[_id,currentTime]);
+  Future<AudioPlayer> seek(double currentTime) async {
+    await MediaManager.channel.invokeMethod('seek',[_id,currentTime]);
+    return this;
   }
 
   Future<num> getCurentTime() async {
-    return Umiuni2dMedia.channel.invokeMethod('getCurentTime',[_id]);
+    return MediaManager.channel.invokeMethod('getCurentTime',[_id]);
   }
 
   Future<num> setVolume(num volume, num interval) async {
-    return Umiuni2dMedia.channel.invokeMethod('setVolume',[_id, volume, interval]);
+    return MediaManager.channel.invokeMethod('setVolume',[_id, volume, interval]);
   }
 
   Future<num> getVolume() async {
-    return Umiuni2dMedia.channel.invokeMethod('getVolume',[_id]);
+    return MediaManager.channel.invokeMethod('getVolume',[_id]);
   }
 }

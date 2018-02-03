@@ -91,6 +91,9 @@ class AudioPlayer {
   }
 
   Future<AudioPlayer> seek(double currentTime) async {
+    if(currentTime < 0.0) {
+      currentTime = 0.0;
+    }
     await MediaManager.channel.invokeMethod('seek',[_id,currentTime]);
     return this;
   }
@@ -100,6 +103,9 @@ class AudioPlayer {
   }
 
   Future<AudioPlayer> setVolume(double volume) async {
+    if(volume < 0) {
+      volume = 0.0;
+    }
     await MediaManager.channel.invokeMethod('setVolume',[_id, volume, 0.1]);
     return this;
   }

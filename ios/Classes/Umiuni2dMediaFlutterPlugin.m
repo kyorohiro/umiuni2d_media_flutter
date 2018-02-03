@@ -80,7 +80,7 @@
             result(@"{\"status\":\"passed\"}");
             return;
         } else if([methodName isEqualToString:@"getCurentTime"]){
-            result([[NSNumber alloc] initWithDouble:player.currentTime]);
+            result([NSString stringWithFormat:@"{\"status\":\"passed\", \"value\":%lf}", player.currentTime]);
             return;
         } else if([methodName isEqualToString:@"setVolume"]){
             NSArray *args = call.arguments;
@@ -90,7 +90,7 @@
             result(@"{\"status\":\"passed\"}");
             return;
         } else if([methodName isEqualToString:@"getVolume"]){
-            result([[NSNumber alloc] initWithDouble:player.volume]);
+            result([NSString stringWithFormat:@"{\"status\":\"passed\", \"value\":%lf}", player.volume]);
             return;
         }
     }

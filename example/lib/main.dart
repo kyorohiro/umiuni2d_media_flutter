@@ -149,9 +149,11 @@ class _MyAppState extends sky.State<MyApp> {
       }
       if(label == "+5s") {
         await _audio.seek(await _audio.getCurrentTime()+5.0);
+        message += "${await _audio.getCurrentTime()}";
       }
       if(label == "-5s") {
         await _audio.seek(await _audio.getCurrentTime()-5.0);
+        message += "${await _audio.getCurrentTime()}";
       }
       if(label == 'volume up') {
         await _audio.seek(await _audio.getCurrentTime()-5.0);

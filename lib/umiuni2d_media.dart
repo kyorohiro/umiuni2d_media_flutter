@@ -177,10 +177,15 @@ class AudioPlayer extends umi.AudioPlayer  {
 
   @override
   Future<double> getCurrentTime() async {
-    if(isPlaying) {
+    if(!isPrepared || !isPlaying) {
       return this._pauseAt;
     } else {
-      return MediaManager.channel.invokeMethod('getCurentTime', [_id]);
+      String resultSrc = await MediaManager.channel.invokeMethod('getCurentTime', [_id]);
+      Map<String,Object> resultObj = conv.JSON.decode(resultSrc);
+      if(resultObj["status"] != "passed") {
+        throw resultSrc;
+      }
+      return resultObj["value"] as double;
     }
   }
 

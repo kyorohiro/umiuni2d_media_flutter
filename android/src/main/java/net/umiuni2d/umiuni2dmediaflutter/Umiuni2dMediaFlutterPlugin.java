@@ -112,7 +112,7 @@ public class Umiuni2dMediaFlutterPlugin implements MethodCallHandler {
     } else if(call.method.equals("getCurentTime")) {
       try {
         int v = player.getCurrentPosition();
-        result.success(((double)v)/1000.0);
+        result.success("{\"status\":\"passed\",\"value\":"+(((double)v)/1000.0)+"}");
       } catch(Exception e) {
         result.success("{\"status\":\"failed\"}");
       }
@@ -129,7 +129,7 @@ public class Umiuni2dMediaFlutterPlugin implements MethodCallHandler {
       return;
     } else if(call.method.equals("getVolume")) {
       try {
-        result.success(mVolume);
+        result.success("{\"status\":\"passed\",\"value\":"+(mVolume)+"}");
       } catch(Exception e) {
         result.success("{\"status\":\"failed\"}");
       }

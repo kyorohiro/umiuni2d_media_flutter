@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/services.dart' as service;
 import 'package:umiuni2d_media/umiuni2d_media.dart' as umi;
 import 'dart:io';
+import 'dart:convert' as conv;
 
 
 class MediaManager extends umi.MediaManager{
@@ -92,25 +93,41 @@ class AudioPlayer extends umi.AudioPlayer  {
 
   @override
   Future<AudioPlayer> prepare() async {
-    await MediaManager._channel.invokeMethod('load',[_id, _path]);
+    String resultSrc = await MediaManager._channel.invokeMethod('load',[_id, _path]);
+    Map<String,String> resultObj = conv.JSON.decode(resultSrc);
+    if(resultObj["status"] != "passed") {
+      throw resultSrc;
+    }
     return this;
   }
 
   @override
   Future<AudioPlayer> play() async {
-    await MediaManager._channel.invokeMethod('play',[_id]);
+    String resultSrc = await MediaManager._channel.invokeMethod('play',[_id]);
+    Map<String,String> resultObj = conv.JSON.decode(resultSrc);
+    if(resultObj["status"] != "passed") {
+      throw resultSrc;
+    }
     return this;
   }
 
   @override
   Future<AudioPlayer> pause() async {
-    await MediaManager.channel.invokeMethod('pause',[_id]);
+    String resultSrc = await MediaManager.channel.invokeMethod('pause',[_id]);
+    Map<String,String> resultObj = conv.JSON.decode(resultSrc);
+    if(resultObj["status"] != "passed") {
+      throw resultSrc;
+    }
     return this;
   }
 
   @override
   Future<AudioPlayer> stop() async {
-    await MediaManager.channel.invokeMethod('stop',[_id]);
+    String resultSrc = await MediaManager.channel.invokeMethod('stop',[_id]);
+    Map<String,String> resultObj = conv.JSON.decode(resultSrc);
+    if(resultObj["status"] != "passed") {
+      throw resultSrc;
+    }
     return this;
   }
 
@@ -119,7 +136,11 @@ class AudioPlayer extends umi.AudioPlayer  {
     if(currentTime < 0.0) {
       currentTime = 0.0;
     }
-    await MediaManager.channel.invokeMethod('seek',[_id,currentTime]);
+    String resultSrc = await MediaManager.channel.invokeMethod('seek',[_id,currentTime]);
+    Map<String,String> resultObj = conv.JSON.decode(resultSrc);
+    if(resultObj["status"] != "passed") {
+      throw resultSrc;
+    }
     return this;
   }
 
@@ -133,7 +154,11 @@ class AudioPlayer extends umi.AudioPlayer  {
     if(volume < 0) {
       volume = 0.0;
     }
-    await MediaManager.channel.invokeMethod('setVolume',[_id, volume, 0.1]);
+    String resultSrc = await MediaManager.channel.invokeMethod('setVolume',[_id, volume, 0.1]);
+    Map<String,String> resultObj = conv.JSON.decode(resultSrc);
+    if(resultObj["status"] != "passed") {
+      throw resultSrc;
+    }
     return this;
   }
 

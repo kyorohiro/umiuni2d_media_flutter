@@ -15,8 +15,8 @@ class _MyAppState extends sky.State<MyApp> {
   String _message = 'Unknown';
 
   Map<String,String> audioFiles = {
-    "acoustic09.mp3":"assets/bgm_maoudamashii_acoustic09.mp3",
-    "lastboss0.mp3":"assets/bgm_maoudamashii_lastboss0.mp3",
+    "acoustic09.mp3":"bgm_maoudamashii_acoustic09.mp3",
+    "lastboss0.mp3":"bgm_maoudamashii_lastboss0.mp3",
   };
   String radioValue = "lastboss0.mp3";
   _MyAppStat() {

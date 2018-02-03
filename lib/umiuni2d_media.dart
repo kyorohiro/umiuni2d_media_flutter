@@ -8,9 +8,18 @@ class MediaManager extends umi.MediaManager{
   static const service.MethodChannel _channel = const service.MethodChannel('umiuni2d_media');
   static service.MethodChannel get channel => _channel;
 
-  String assetsRoot;
-  MediaManager(this.assetsRoot) {
+  String _assetsRoot;
+  String get assetsRoot => _assetsRoot;
+  void set assetsRoot(String v) {
+    v = v.replaceAll(new RegExp(r"/$"), "");
+    v = v.replaceAll(new RegExp(r"^/"), "");
+    _assetsRoot = v;
   }
+
+  MediaManager(String assetsRoot) {
+    this.assetsRoot = assetsRoot;
+  }
+
   Future<String> getPath() async {
     return _channel.invokeMethod('getPath');
   }
@@ -18,9 +27,7 @@ class MediaManager extends umi.MediaManager{
   Future<String> getAssetPath(String key) async {
     String path = (await getPath()).replaceAll(new RegExp(r"/$"), "");
     String keyPath = (path).replaceAll(new RegExp(r"^/"), "");
-    String assets = assetsRoot.replaceAll(new RegExp(r"/$"), "");
-    assets = assets.replaceAll(new RegExp(r"^/"), "");
-    return path + "/"+assets+"/" + key;
+    return path + "/"+this.assetsRoot+"/" + key;
   }
 
   Future<String> _prepareAssetPath(String key) async {
@@ -32,9 +39,8 @@ class MediaManager extends umi.MediaManager{
 
   Future<MediaManager> setupMedia(String key) async {
     String outputPath = await _prepareAssetPath(key);
-    print("=TEST="+outputPath);
     service.AssetBundle bundle =  (service.rootBundle != null) ? service.rootBundle : new service.NetworkAssetBundle(new Uri.directory(Uri.base.origin));
-    service.ByteData data = await bundle.load(key);
+    service.ByteData data = await bundle.load("/"+this.assetsRoot+"/"+key);
     File output = new File(outputPath);
     await output.writeAsBytes(data.buffer.asUint8List(),flush: true);
     return this;
@@ -42,23 +48,28 @@ class MediaManager extends umi.MediaManager{
 
   Map<String, AudioPlayer> _audioMap = {};
   Future<AudioPlayer> loadAudioPlayer(String id, String key) async {
+    print("call load Au 1");
     AudioPlayer player = await createAudioPlayer(id, key);
-    player.prepare();
+    print("call load Au 2");
+    await player.prepare();
     return player;
   }
 
   Future<AudioPlayer> createAudioPlayer(String id, String key) async {
     String path = await getAssetPath(key);
+    print("PARH ${path}");
     File f = new File(path);
     if(false == await f.exists()) {
       setupMedia(key);
     }
     AudioPlayer ret =  new AudioPlayer(id, path);
+    print(">id>${id} ${path}");
     _audioMap[id] = ret;
     return ret;
   }
 
   AudioPlayer getAudioPlayer(String id) {
+    print("<id<${id}");
     return _audioMap[id];
   }
 }

@@ -52,7 +52,7 @@ class MediaManager {
     return ret;
   }
 
-  AudioPlayer getAudio(String id) {
+  AudioPlayer getAudioPlayer(String id) {
     return _audioMap[id];
   }
 }

@@ -134,7 +134,7 @@ class _MyAppState extends sky.State<MyApp> {
     }
 
     String message = "";
-    AudioPlayer _audio = _player.getAudio(radioValue);
+    AudioPlayer _audio = _player.getAudioPlayer(radioValue);
     print("## ${_audio.id} ${_audio.path}");
     try {
       if(label == "Play") {

@@ -34,9 +34,7 @@ class _MyAppState extends sky.State<MyApp> {
     new Future.delayed(new Duration(seconds: 0)).then((dynamic d) async {
       String message = "";
       try {
-        //
         for(String key in  audioFiles.keys) {
-          //await _player.getAssetPath(audioFiles[key]);
           await _player.setupMedia(audioFiles[key]);
           await _player.loadAudioPlayer(key, audioFiles[key]);
         }

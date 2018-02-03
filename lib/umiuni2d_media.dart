@@ -10,7 +10,8 @@ class MediaManager extends umi.MediaManager{
 
   String _assetsRoot;
   String get assetsRoot => _assetsRoot;
-  void set assetsRoot(String v) {
+
+  set assetsRoot(String v) {
     v = v.replaceAll(new RegExp(r"/$"), "");
     v = v.replaceAll(new RegExp(r"^/"), "");
     _assetsRoot = v;
@@ -25,9 +26,9 @@ class MediaManager extends umi.MediaManager{
   }
 
   Future<String> getAssetPath(String key) async {
-    String path = (await getPath()).replaceAll(new RegExp(r"/$"), "");
-    String keyPath = (path).replaceAll(new RegExp(r"^/"), "");
-    return path + "/"+this.assetsRoot+"/" + key;
+    String p = (await getPath()).replaceAll(new RegExp(r"/$"), "");
+    String k = key.replaceAll(new RegExp(r"^/"), "");
+    return p + "/"+this.assetsRoot+"/" + k;
   }
 
   Future<String> _prepareAssetPath(String key) async {
@@ -37,6 +38,7 @@ class MediaManager extends umi.MediaManager{
     return path;
   }
 
+  @override
   Future<MediaManager> setupMedia(String key) async {
     String outputPath = await _prepareAssetPath(key);
     service.AssetBundle bundle =  (service.rootBundle != null) ? service.rootBundle : new service.NetworkAssetBundle(new Uri.directory(Uri.base.origin));
@@ -47,6 +49,8 @@ class MediaManager extends umi.MediaManager{
   }
 
   Map<String, AudioPlayer> _audioMap = {};
+
+  @override
   Future<AudioPlayer> loadAudioPlayer(String id, String key) async {
     print("call load Au 1");
     AudioPlayer player = await createAudioPlayer(id, key);
@@ -55,21 +59,20 @@ class MediaManager extends umi.MediaManager{
     return player;
   }
 
+  @override
   Future<AudioPlayer> createAudioPlayer(String id, String key) async {
     String path = await getAssetPath(key);
-    print("PARH ${path}");
     File f = new File(path);
     if(false == await f.exists()) {
       setupMedia(key);
     }
     AudioPlayer ret =  new AudioPlayer(id, path);
-    print(">id>${id} ${path}");
     _audioMap[id] = ret;
     return ret;
   }
 
+  @override
   AudioPlayer getAudioPlayer(String id) {
-    print("<id<${id}");
     return _audioMap[id];
   }
 }
@@ -87,26 +90,31 @@ class AudioPlayer extends umi.AudioPlayer  {
     this._path = path;
   }
 
+  @override
   Future<AudioPlayer> prepare() async {
     await MediaManager._channel.invokeMethod('load',[_id, _path]);
     return this;
   }
 
+  @override
   Future<AudioPlayer> play() async {
     await MediaManager._channel.invokeMethod('play',[_id]);
     return this;
   }
 
+  @override
   Future<AudioPlayer> pause() async {
     await MediaManager.channel.invokeMethod('pause',[_id]);
     return this;
   }
 
+  @override
   Future<AudioPlayer> stop() async {
     await MediaManager.channel.invokeMethod('stop',[_id]);
     return this;
   }
 
+  @override
   Future<AudioPlayer> seek(double currentTime) async {
     if(currentTime < 0.0) {
       currentTime = 0.0;
@@ -115,10 +123,12 @@ class AudioPlayer extends umi.AudioPlayer  {
     return this;
   }
 
+  @override
   Future<double> getCurrentTime() async {
     return MediaManager.channel.invokeMethod('getCurentTime',[_id]);
   }
 
+  @override
   Future<AudioPlayer> setVolume(double volume) async {
     if(volume < 0) {
       volume = 0.0;
@@ -127,6 +137,7 @@ class AudioPlayer extends umi.AudioPlayer  {
     return this;
   }
 
+  @override
   Future<double> getVolume() async {
     return MediaManager.channel.invokeMethod('getVolume',[_id]);
   }

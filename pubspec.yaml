@@ -1,0 +1,14 @@
+name: umiuni2d_media_flutter
+description: A new Flutter project.
+version: 0.0.1
+author:
+homepage:
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+flutter:
+  plugin:
+    androidPackage: net.umiuni2d.umiuni2dmediaflutter
+    pluginClass: Umiuni2dMediaFlutterPlugin

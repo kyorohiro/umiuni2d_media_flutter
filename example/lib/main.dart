@@ -150,20 +150,20 @@ class _MyAppState extends sky.State<MyApp> {
         await _audio.stop();
       }
       if(label == "+5s") {
-        await _audio.seek(await _audio.getCurentTime()+5.0);
+        await _audio.seek(await _audio.getCurrentTime()+5.0);
       }
       if(label == "-5s") {
-        await _audio.seek(await _audio.getCurentTime()-5.0);
+        await _audio.seek(await _audio.getCurrentTime()-5.0);
       }
       if(label == 'volume up') {
-        await _audio.seek(await _audio.getCurentTime()-5.0);
+        await _audio.seek(await _audio.getCurrentTime()-5.0);
       }
       if(label == 'Volume down') {
-        await _audio.setVolume(await _audio.getVolume()-0.1, 1.0);
+        await _audio.setVolume(await _audio.getVolume()-0.1);
         message += ""+(await _audio.getVolume()).toString();
       }
       if(label == 'Volume up') {
-        await _audio.setVolume(await _audio.getVolume()+0.1, 1.0);
+        await _audio.setVolume(await _audio.getVolume()+0.1);
         message += ""+(await _audio.getVolume()).toString();
       }
     } catch (e) {

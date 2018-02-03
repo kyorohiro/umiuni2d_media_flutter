@@ -37,8 +37,8 @@ class _MyAppState extends sky.State<MyApp> {
         //
         for(String key in  audioFiles.keys) {
           //await _player.getAssetPath(audioFiles[key]);
-          await _player.setupFromAssets(audioFiles[key]);
-          await _player.load(key, audioFiles[key]);
+          await _player.setupMedia(audioFiles[key]);
+          await _player.loadAudioPlayer(key, audioFiles[key]);
         }
         message += "# ok"+ '\r\n';
       } catch (e) {

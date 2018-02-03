@@ -7,10 +7,6 @@ class MediaManager {
   static const service.MethodChannel _channel = const service.MethodChannel('umiuni2d_media');
   static service.MethodChannel get channel => _channel;
 
-  Future<String> platformVersion() async {
-    return _channel.invokeMethod('getPlatformVersion');
-  }
-
   Future<String> getPath() async {
     return _channel.invokeMethod('getPath');
   }
@@ -21,14 +17,15 @@ class MediaManager {
     return path + "/assets/" + key;
   }
 
-  Future<String> prepareAssetPath(String key) async {
+  Future<String> _prepareAssetPath(String key) async {
     String path = await getAssetPath(key);
     String dir = path.replaceAll(new RegExp(r"/[^/]*$"), path);
     await (new Directory(dir)).create(recursive: true);
     return path;
   }
-  Future<MediaManager> setupFromAssets(String key) async {
-    String outputPath = await prepareAssetPath(key);
+
+  Future<MediaManager> setupMedia(String key) async {
+    String outputPath = await _prepareAssetPath(key);
     print("=TEST="+outputPath);
     service.AssetBundle bundle =  (service.rootBundle != null) ? service.rootBundle : new service.NetworkAssetBundle(new Uri.directory(Uri.base.origin));
     service.ByteData data = await bundle.load(key);
@@ -36,17 +33,20 @@ class MediaManager {
     await output.writeAsBytes(data.buffer.asUint8List(),flush: true);
     return this;
   }
+
   Map<String, AudioPlayer> _audioMap = {};
-  Future<AudioPlayer> load(String id, String key) async {
-    String path = await getAssetPath(key);
-    AudioPlayer ret =  new AudioPlayer(id, path);
-    await ret.prepare();
-    _audioMap[id] = ret;
-    return ret;
+  Future<AudioPlayer> loadAudioPlayer(String id, String key) async {
+    AudioPlayer player = await createAudioPlayer(id, key);
+    player.prepare();
+    return player;
   }
 
   Future<AudioPlayer> createAudioPlayer(String id, String key) async {
     String path = await getAssetPath(key);
+    File f = new File(path);
+    if(false == await f.exists()) {
+      setupMedia(key);
+    }
     AudioPlayer ret =  new AudioPlayer(id, path);
     _audioMap[id] = ret;
     return ret;

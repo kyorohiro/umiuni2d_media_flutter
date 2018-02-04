@@ -10,6 +10,7 @@ dependencies:
   umiuni2d_media:
     git:
       url: https://github.com/kyorohiro/umiuni2d_media.git
+      ref: v0.0.1
 flutter:
   plugin:
     androidPackage: net.umiuni2d.umiuni2dmediaflutter
